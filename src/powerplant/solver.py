@@ -45,18 +45,22 @@ def _effective_bounds_tenths(plant: PowerPlant, fuels: Fuels) -> tuple[int, int]
     return _to_tenths(plant.pmin), _to_tenths(plant.pmax)
 
 
+def _build_merit_entry(idx: int, plant: PowerPlant, fuels: Fuels) -> _MeritEntry:
+    pmin_t, pmax_t = _effective_bounds_tenths(plant, fuels)
+    return _MeritEntry(
+        cost=_marginal_cost(plant, fuels),
+        pmin_t=pmin_t,
+        pmax_t=pmax_t,
+        index=idx,
+        plant=plant,
+    )
+
+
 def solve_production_plan(request: ProductionPlanRequest) -> list[PlantOutput]:
     """Compute merit-order dispatch in 0.1 MW units matching request.load exactly."""
     merit = [
-        _MeritEntry(
-            cost=_marginal_cost(plant, request.fuels),
-            pmin_t=bounds[0],
-            pmax_t=bounds[1],
-            index=idx,
-            plant=plant,
-        )
+        _build_merit_entry(idx, plant, request.fuels)
         for idx, plant in enumerate(request.powerplants)
-        for bounds in [_effective_bounds_tenths(plant, request.fuels)]
     ]
     merit.sort(key=lambda e: (e.cost, -e.pmax_t, e.index))
 

@@ -4,7 +4,6 @@ import os
 from dataclasses import dataclass
 
 CO2_TONS_PER_MWH = 0.3
-POWER_ROUNDING_STEP = 0.1
 POWER_UNITS_PER_MW = 10
 PERCENT_DIVISOR = 100.0
 

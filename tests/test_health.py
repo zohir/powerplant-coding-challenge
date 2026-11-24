@@ -24,9 +24,12 @@ def test_unhandled_exception_surfaces_real_detail() -> None:
         raise RuntimeError("boom diagnostic detail")
 
     app.include_router(router)
-    response = client.get("/_test-boom")
-    assert response.status_code == 500
-    assert response.json() == {"detail": "boom diagnostic detail"}
+    try:
+        response = client.get("/_test-boom")
+        assert response.status_code == 500
+        assert response.json() == {"detail": "boom diagnostic detail"}
+    finally:
+        app.router.routes.pop()
 
 
 @pytest.mark.parametrize("missing_var", ["APP_PORT", "APP_HOST", "LOG_LEVEL"])
