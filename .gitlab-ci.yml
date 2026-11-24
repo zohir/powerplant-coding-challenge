@@ -1,0 +1,18 @@
+image: python:3.12-slim-bookworm
+
+stages:
+  - lint
+  - test
+
+before_script:
+  - pip install --no-cache-dir ".[dev]"
+
+lint:
+  stage: lint
+  script:
+    - ruff check .
+
+test:
+  stage: test
+  script:
+    - pytest

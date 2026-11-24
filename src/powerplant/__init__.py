@@ -1,0 +1,1 @@
+"""Reusable FastAPI service baseline."""
