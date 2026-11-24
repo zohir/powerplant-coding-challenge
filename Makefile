@@ -1,5 +1,7 @@
 IMAGE_NAME ?= powerplant-api
+APP_HOST ?= 0.0.0.0
 PORT ?= 8888
+LOG_LEVEL ?= INFO
 CONTAINER_CLI ?= $(shell command -v docker || command -v podman || echo /opt/podman/bin/podman)
 
 .DEFAULT_GOAL := help
@@ -16,12 +18,12 @@ lint: ## Run Ruff linter
 	uv run ruff check .
 
 test: ## Run pytest suite
-	uv run pytest
+	APP_HOST=$(APP_HOST) APP_PORT=$(PORT) LOG_LEVEL=$(LOG_LEVEL) uv run pytest
 
 check: lint test ## Run linter and test suite
 
 run: ## Start FastAPI server locally on port 8888
-	uv run uvicorn powerplant.main:app --host 0.0.0.0 --port $(PORT)
+	APP_HOST=$(APP_HOST) APP_PORT=$(PORT) LOG_LEVEL=$(LOG_LEVEL) uv run uvicorn powerplant.main:app --host $(APP_HOST) --port $(PORT)
 
 clean: ## Remove local Python and test caches
 	rm -rf .pytest_cache .ruff_cache && find src tests -type d -name __pycache__ -exec rm -rf {} +

@@ -1,5 +1,10 @@
 image: python:3.12-slim-bookworm
 
+variables:
+  APP_HOST: "0.0.0.0"
+  APP_PORT: "8888"
+  LOG_LEVEL: "INFO"
+
 stages:
   - lint
   - test

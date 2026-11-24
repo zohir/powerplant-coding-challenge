@@ -3,6 +3,19 @@
 import os
 from dataclasses import dataclass
 
+CO2_TONS_PER_MWH = 0.3
+POWER_ROUNDING_STEP = 0.1
+POWER_UNITS_PER_MW = 10
+PERCENT_DIVISOR = 100.0
+
+
+def _require_env(name: str) -> str:
+    """Return a required non-empty environment variable or fail fast."""
+    value = os.getenv(name)
+    if value is None or not value.strip():
+        raise RuntimeError(f"Missing required environment variable: {name}")
+    return value.strip()
+
 
 @dataclass(frozen=True)
 class Settings:
@@ -14,8 +27,8 @@ class Settings:
 
     @classmethod
     def from_env(cls) -> "Settings":
-        """Build and validate runtime settings."""
-        raw_port = os.getenv("APP_PORT", "8888")
+        """Build and validate runtime settings from required environment variables."""
+        raw_port = _require_env("APP_PORT")
         try:
             app_port = int(raw_port)
         except ValueError as exc:
@@ -23,13 +36,8 @@ class Settings:
         if not 1 <= app_port <= 65535:
             raise ValueError(f"Invalid APP_PORT={app_port}: must be between 1 and 65535")
 
-        app_host = os.getenv("APP_HOST", "0.0.0.0").strip()
-        if not app_host:
-            raise ValueError("APP_HOST must not be empty")
-
-        log_level = os.getenv("LOG_LEVEL", "INFO").strip().upper()
-        if not log_level:
-            raise ValueError("LOG_LEVEL must not be empty")
+        app_host = _require_env("APP_HOST")
+        log_level = _require_env("LOG_LEVEL").upper()
 
         return cls(app_host=app_host, app_port=app_port, log_level=log_level)
 
